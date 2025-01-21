@@ -1,24 +1,32 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <sequence name="template_cpe_replacement_survey_17b" xmlns="http://ws.apache.org/ns/synapse">
-    <property name="placeholder1"
-        expression="substring-before(get-property('placeholdersData'), ',')"
-        scope="default" />
-    <property name="placeholder2"
-        expression="substring-after(get-property('placeholdersData'), ',')"
-        scope="default" />
+
+     <script language="js">
+        <![CDATA[
+        var placeholdersData = mc.getProperty('placeholders');
+        if (placeholdersData) {
+            // Parse the JSON array of placeholders
+            var placeholdersArray = JSON.parse(placeholdersData);
+            for (var i = 0; i < placeholdersArray.length; i++) {
+                mc.setProperty('placeholder' + (i + 1), placeholdersArray[i]);
+            }
+        }
+        ]]>
+    </script>
     <payloadFactory media-type="json" template-type="default">
         <format> {
                     "messages": [
                         {
                             "from": "$1",
                             "to": "$2",
+                            "messageId": "$3",
                             "content": {
-                                "templateName": "$3",
+                                "templateName": "$4",
                                 "templateData": {
                                     "body": {
                                         "placeholders": [
-                                            "$4",
-                                            "$5"
+                                            "$5",
+                                            "$6"
                                         ]
                                     },
                                     "buttons": [

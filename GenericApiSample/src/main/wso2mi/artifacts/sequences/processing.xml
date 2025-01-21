@@ -4,6 +4,7 @@
 
     <log level="full">
         <property name="INFO111" value="inside processing..." />
+        <property name="templateName------process" expression="get-property('templateName')" />
     </log>
 
     <!-- <sequence key="processingssssss" /> -->
@@ -94,6 +95,10 @@
             <address uri="${infobipUrl}" />
         </endpoint>
     </call>
+    <property name="infobipResponse"  expression="json-eval($.)" />
+    <log level="full">
+        <property name="infobipResponse-----------" expression="get-property('infobipResponse')" />
+    </log>
     <property name="integrationNo" scope="transport" type="STRING" value="I1125" />
     <property name="type" scope="transport" type="STRING" value="Response Body" />
 
@@ -104,8 +109,9 @@
     </call>
     <property description="HTTP status = 200" name="HTTP_SC" scope="axis2" type="STRING" value="204" />
     <payloadFactory media-type="json">
-        <format>{"Status": "Success"}</format>
+        <format>$1</format>
         <args>
+            <arg expression="get-property('infobipResponse')"></arg>
         </args>
     </payloadFactory>
 <respond />
