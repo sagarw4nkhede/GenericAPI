@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<api context="/form-data" name="form-data" xmlns="http://ws.apache.org/ns/synapse">
+    <resource methods="POST" faultSequence="onErrorSequence">
+        <inSequence>
+            <log level="full">
+                <property name="INFO" value="Starting integration processing..." />
+            </log>
+            <property description="retry count " name="RETRY_COUNT" scope="default" type="STRING"
+                value="0" />
+            <enrich>
+                <source type="body" />
+                <target type="property" property="requestPayload" />
+            </enrich>
+            <property name="send_to" expression="$ctx:requestPayload/send_to" scope="default" />
+            <property name="templateName" expression="$ctx:requestPayload/templateName"
+                scope="default" />
+            <property name="from" expression="$ctx:requestPayload/from" scope="default" />
+            <property name="placeholdersData" expression="//xformValues/placeholders"
+                scope="default" />
+            <property name="integrationNo" scope="transport" type="STRING" value="I1125" />
+            <property name="type" scope="transport" type="STRING" value="Incoming Request" />
+
+            <log level="full">
+                <property name="INFO111" value="after propess" />
+            </log>
+            <payloadFactory media-type="json" template-type="default">
+                <format> $1</format>
+                <args>
+                    <arg expression="get-property('requestPayload')" />
+                </args>
+            </payloadFactory>
+
+            <call blocking="false">
+                <endpoint key="LogAPI" />
+            </call>
+            <sequence key="processing"></sequence>
+        </inSequence>
+    </resource>
+</api>

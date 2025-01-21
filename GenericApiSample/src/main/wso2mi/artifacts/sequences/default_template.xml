@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<sequence name="default_template" trace="disable" xmlns="http://ws.apache.org/ns/synapse">
+
+    <payloadFactory media-type="json" template-type="default">
+        <format> { "error": "Template Not Found", "message": "The requested template : $1 was not found.","status": "404" } </format>
+        <args>
+            <arg expression="get-property('templateName')" />
+        </args>
+    </payloadFactory>
+    <respond />
+    
+</sequence>
+

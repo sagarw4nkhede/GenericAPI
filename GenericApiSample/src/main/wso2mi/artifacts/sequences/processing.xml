@@ -1,0 +1,113 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<sequence name="processing" onError="onErrorSequence" trace="disable"
+    xmlns="http://ws.apache.org/ns/synapse">
+
+    <log level="full">
+        <property name="INFO111" value="inside processing..." />
+    </log>
+
+    <!-- <sequence key="processingssssss" /> -->
+    <switch source="get-property('templateName')">
+        <case regex="draft_psa">
+            <sequence key="template_draft_psa" />
+        </case>
+        <case regex="psa_1">
+            <sequence key="template_psa_1" />
+        </case>
+        <case regex="psa_6">
+            <sequence key="template_psa_6" />
+        </case>
+        <case regex="psa_7_1">
+            <sequence key="template_psa_7_1" />
+        </case>
+        <case regex="psa_7_2">
+            <sequence key="template_psa_7_2" />
+        </case>
+        <case regex="psa_7b">
+            <sequence key="template_psa_7b" />
+        </case>
+        <!-- PM Cases -->
+        <case regex="pm_1_1parameter">
+            <sequence key="template_pm_1_1parameter" />
+        </case>
+        <case regex="pm_1_2parameter">
+            <sequence key="template_pm_1_2parameter" />
+        </case>
+        <case regex="pm_2_1parameter">
+            <sequence key="template_pm_2_1parameter" />
+        </case>
+        <case regex="pm_2_2parameter">
+            <sequence key="template_pm_2_2parameter" />
+        </case>
+        <case regex="pm_3_1parameter">
+            <sequence key="template_pm_3_1parameter" />
+        </case>
+        <case regex="pm_3_2parameter">
+            <sequence key="template_pm_3_2parameter" />
+        </case>
+        <!-- CPE Replacement Survey -->
+        <case regex="cpe_replacement_survey_17b">
+            <sequence key="template_cpe_replacement_survey_17b" />
+        </case>
+        <case regex="cpe_replacement_survey_17a">
+            <sequence key="template_cpe_replacement_survey_17a" />
+        </case>
+        <!-- CPE Replacement Delay -->
+        <case regex="cpe_replacement_delay_25a">
+            <sequence key="template_cpe_replacement_delay_25a" />
+        </case>
+        <case regex="cpe_replacement_delay_25b">
+            <sequence key="template_cpe_replacement_delay_25b" />
+        </case>
+        <!-- CPE Replacement Delivery -->
+        <case regex="cpe_replacement_delivery_30a">
+            <sequence key="template_cpe_replacement_delivery_30a" />
+        </case>
+        <case regex="cpe_replacement_delivery_30b">
+            <sequence key="template_cpe_replacement_delivery_30b" />
+        </case>
+        <case regex="cpe_replacement_delivery_16">
+            <sequence key="template_cpe_replacement_delivery_16" />
+        </case>
+        <case regex="cpe_replacement_delivery_16b">
+            <sequence key="template_cpe_replacement_delivery_16b" />
+        </case>
+        <default>
+            <sequence key="default_template" />
+        </default>
+    </switch>
+
+    <log level="full">
+        <property name="aftswitch" value="after switch..." />
+    </log>
+    <sequence key="getInfobipConfigs" />
+    <payloadFactory media-type="json">
+        <format>$1</format>
+        <args>
+            <arg evaluator="xml" expression="get-property('infobipPayload')" />
+        </args>
+    </payloadFactory>
+
+    <header name="Authorization" action="set" scope="transport" expression="get-property('apiKey')" />
+    <call>
+        <endpoint>
+            <address uri="${infobipUrl}" />
+        </endpoint>
+    </call>
+    <property name="integrationNo" scope="transport" type="STRING" value="I1125" />
+    <property name="type" scope="transport" type="STRING" value="Response Body" />
+
+    <!--Calling
+    Logger Endpoint to Insert the Response-->
+    <call>
+        <endpoint key="LogAPI" />
+    </call>
+    <property description="HTTP status = 200" name="HTTP_SC" scope="axis2" type="STRING" value="204" />
+    <payloadFactory media-type="json">
+        <format>{"Status": "Success"}</format>
+        <args>
+        </args>
+    </payloadFactory>
+<respond />
+
+</sequence>

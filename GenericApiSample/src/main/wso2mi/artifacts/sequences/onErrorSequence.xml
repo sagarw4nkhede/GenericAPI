@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<sequence name="onErrorSequence" trace="disable" xmlns="http://ws.apache.org/ns/synapse">
+    <log description="fail message" level="custom">
+        <property name="message" value="Processing failed"/>
+        <property name="exc------------" expression="$ctx:ERROR_MESSAGE"/>
+    </log>
+    
+    <property description="retry count" expression="get-property('RETRY_COUNT') + 1" name="RETRY_COUNT" scope="default" type="STRING"/>
+    <log description="current iteration" level="custom">
+        <property expression="get-property('RETRY_COUNT')" name="message"/>
+    </log>
+    <filter description="decide " regex="3.0" source="get-property('RETRY_COUNT')">
+        <then>
+            <property name="exception" scope="transport" type="STRING" expression="get-property('ERROR_MESSAGE')" />
+            <property name="errorCode" scope="transport" type="STRING" expression="get-property('ERROR_CODE')" />
+            <property name="integrationNo" scope="transport" type="STRING" value="I1125" />
+            <call>
+                <endpoint key="LogAPI" />
+            </call>
+            <property description="HTTP status = 500" name="HTTP_SC" scope="axis2" type="STRING" value="500"/>
+            <payloadFactory media-type="json" >
+                <format> {"Status":"Error"}</format>
+                <args>
+                </args>
+            </payloadFactory>
+            <respond description="respond"/>
+        </then>
+        <else>
+            <script description="sleep" language="js"><![CDATA[java.lang.Thread.sleep(5000);]]></script>
+            <sequence key="processing"/>
+        </else>
+    </filter>
+</sequence>
